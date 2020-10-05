@@ -10,88 +10,89 @@ module comm(
 //  input [7:0] GPin  // general purpose inputs
 );
 
-	wire txDone;
-	wire txActive;
+    wire txDone;
+    wire txActive;
 
-	reg txDrive;
+    reg txDrive;
 
-	reg [7:0] GPin;
+    reg [7:0] GPin;
 
     // For 112500 baud with CLK @ 50MHz
     localparam CLKS_PER_BIT = 444;
 
-	localparam IDLE         = 3'b000;
-	localparam START        = 3'b001;
-	localparam WAIT_READY   = 3'b010;
-	localparam DONE  		= 3'b011;
-	localparam WAIT_DONE    = 3'b100;
+    localparam IDLE         = 3'b000;
+    localparam START        = 3'b001;
+    localparam WAIT_READY   = 3'b010;
+    localparam DONE  		= 3'b011;
+    localparam WAIT_DONE    = 3'b100;
 
-	localparam LOW          = 1'b0;
-	localparam HIGH         = 1'b1;
+    localparam LOW          = 1'b0;
+    localparam HIGH         = 1'b1;
 
-	reg [2:0] SM = IDLE;
+    reg [2:0] SM = IDLE;
 
-	integer count = 0;
+    integer count = 0;
 
-	always @(posedge CLK_50)
-	begin
+    always @(posedge CLK_50)
+    begin
 
-		txDrive <= LOW;
+        txDrive <= LOW;
 
-		case (SM)
+        case (SM)
 
-		IDLE:
-			begin
-				// Do something interesting here
+            IDLE:
+                begin
+                // Do something interesting here
 
                 // So that this is separated enough
                 // to be decoded for a test
-				if (count == 50000)
-				begin
-					count = 0;
-					SM <= WAIT_READY;
-				end
-				count = count + 1;
-			end
+                    if (count == 50000)
+                    begin
+                        count = 0;
+                        SM <= WAIT_READY;
+                    end
 
-		START:
-			begin
-				txDrive <= HIGH;
-				GPin <= 8'b01000110; // F
-				SM <= WAIT_DONE;
-			end
+                    count = count + 1;
+                end
 
-		WAIT_READY:
-			begin
-				if (txActive == LOW)
-					SM <= START;
-			end
+            START:
+                begin
+                    txDrive <= HIGH;
+                    GPin <= 8'b01000110; // F
+                    SM <= WAIT_DONE;
+                end
 
-		WAIT_DONE:
-			begin
-				if (txDone == HIGH)
-					begin
-						SM <= DONE;
-					end
-			end
+            WAIT_READY:
+                begin
+                    if (txActive == LOW)
+                        SM <= START;
+                end
 
-		DONE:
-			SM <= IDLE;
+            WAIT_DONE:
+                begin
+                    if (txDone == HIGH)
+                    begin
+                        SM <= DONE;
+                    end
+                end
 
-		default:
-			SM <= IDLE;
+            DONE:
+                SM <= IDLE;
 
-		endcase
+            default:
+                SM <= IDLE;
 
-	end
+        endcase
 
-	uart_tx #(.CLKS_PER_BIT(CLKS_PER_BIT)) transmit(.i_Clock(CLK_50),
-										            .i_TX_DV(txDrive),
-										            .i_TX_Byte(GPin),
-										            .i_Rst_L(1), // Has to be high
-										            .o_TX_Serial(TxD),
-										            .o_TX_Active(txActive),
-										            .o_TX_Done(txDone)
-										            );
+    end
+
+    uart_tx #(.CLKS_PER_BIT(CLKS_PER_BIT)) transmit(.i_Clock(CLK_50),
+                .i_TX_DV(txDrive),
+                .i_TX_Byte(GPin),
+                .i_Rst_L(1), // Has to be high
+                .o_TX_Serial(TxD),
+                .o_TX_Active(txActive),
+                .o_TX_Done(txDone)
+                );
 
 endmodule
