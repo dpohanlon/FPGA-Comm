@@ -1,6 +1,6 @@
 module comm(
     input CLK_50,
-//  input RxD,
+    input RxD,
     output TxD
 //	output reg READY_LED = 0,
 //	output reg REC_LED = 0,
@@ -14,8 +14,10 @@ module comm(
     wire txActive;
 
     reg txDrive;
+    reg rxDrive;
 
     reg [7:0] GPin;
+    reg [7:0] GPout;
 
     // For 112500 baud with CLK @ 50MHz
     localparam CLKS_PER_BIT = 444;
@@ -93,6 +95,12 @@ module comm(
                 .o_TX_Serial(TxD),
                 .o_TX_Active(txActive),
                 .o_TX_Done(txDone)
+                );
+
+    uart_rx #(.CLKS_PER_BIT(CLKS_PER_BIT)) receive(.i_Clock(CLK_50),
+                .i_Rx_Serial(RxD),
+                .o_Rx_DV(rxDrive),
+                .o_Rx_Byte(GPout)
                 );
 
 endmodule
