@@ -88,6 +88,9 @@ module comm(
 
     end
 
+    // UART from:
+    // https://www.nandland.com/vhdl/modules/module-uart-serial-port-rs232.html
+
     uart_tx #(.CLKS_PER_BIT(CLKS_PER_BIT)) transmit(.i_Clock(CLK_50),
                 .i_TX_DV(txDrive),
                 .i_TX_Byte(GPin),
