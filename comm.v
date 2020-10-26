@@ -25,7 +25,7 @@ module comm(
     localparam IDLE         = 3'b000;
     localparam START        = 3'b001;
     localparam WAIT_READY   = 3'b010;
-    localparam DONE  		= 3'b011;
+    localparam DONE         = 3'b011;
     localparam WAIT_DONE    = 3'b100;
 
     localparam LOW          = 1'b0;
