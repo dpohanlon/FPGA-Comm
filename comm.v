@@ -16,6 +16,9 @@ module comm(
     reg txDrive;
     reg rxDrive;
 
+    // In case we want to transmit but the Tx line is busy
+    reg txBusy = 1'b0;
+
     reg [7:0] GPin;
     reg [7:0] GPout;
 
@@ -33,8 +36,6 @@ module comm(
 
     reg [2:0] SM = IDLE;
 
-    integer count = 0;
-
     always @(posedge CLK_50)
     begin
 
@@ -44,17 +45,12 @@ module comm(
 
             IDLE:
                 begin
-                // Do something interesting here
-
-                // So that this is separated enough
-                // to be decoded for a test
-                    if (count == 50000)
+                    // If we received anything
+                    if (rxDrive == HIGH || txBusy == HIGH)
                     begin
-                        count = 0;
+                        // (Do something useful with GPout)
                         SM <= WAIT_READY;
                     end
-
-                    count = count + 1;
                 end
 
             START:
@@ -67,7 +63,10 @@ module comm(
             WAIT_READY:
                 begin
                     if (txActive == LOW)
+                    begin
                         SM <= START;
+                        txBusy <= LOW;
+                    end
                 end
 
             WAIT_DONE:
