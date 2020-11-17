@@ -14,13 +14,13 @@ module comm(
     wire txActive;
 
     reg txDrive;
-    reg rxDrive;
+    wire rxDrive;
 
     // In case we want to transmit but the Tx line is busy
     reg txBusy = 1'b0;
 
     reg [7:0] GPin;
-    reg [7:0] GPout;
+    wire [7:0] GPout;
 
     // For 112500 baud with CLK @ 50MHz
     localparam CLKS_PER_BIT = 444;
